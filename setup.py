@@ -5,12 +5,11 @@ Basic setup.py file
 from setuptools import setup, find_packages
 
 setup(
-    name='OOWS',
-    version='0.0.1',
+    name='oows',
+    version='0.0.3',
     author='Felipe "Bidu" Rodrigues',
     author_email='felipe@felipevr.com',
     packages=find_packages(),
-    scripts=[''],
     url='',
     license='LICENSE.md',
     description=' An object-oriented friendly & pythonic client for Amazon Web Services (AWS)',
