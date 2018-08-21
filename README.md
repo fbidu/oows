@@ -1,5 +1,7 @@
 # OOWS
 
+[![Build Status](https://travis-ci.org/fbidu/oows.svg?branch=master)](https://travis-ci.org/fbidu/oows) [![PyPI version](https://badge.fury.io/py/OOWS.svg)](https://badge.fury.io/py/OOWS)
+
 **Warning — this project is in early development. Contributions and feedbacks are welcome. Usage in production systems is discouraged**
 
 OOWS (_oh-owls_) is an object-oriented friendly client for Amazon Web Services — AWS. It is based on [boto3](https://github.com/boto/boto3) official client and aims to provide a cleaner and more Pythonic interface to handle AWS resources.
@@ -27,3 +29,15 @@ cluster = Cluster("MyCluster")
 for service in cluster.services:
     print("The task definition is {}".format(service.task_definition))
 ```
+
+## Quick Start
+
+Currently, OOWS supports only a few ECS components and operations.
+
+First, install it with PIP
+
+`pip install boto3 oows`
+
+```python
+
+s = boto3.Session()  # Create a new boto3 Session 
