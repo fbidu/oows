@@ -1,6 +1,6 @@
 import boto3
 
-from oows.ecs import TaskDefinition
+from .task_definition import TaskDefinition
 
 class Service:
     """

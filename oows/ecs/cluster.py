@@ -1,6 +1,6 @@
 import boto3
 
-from oows.ecs import Service
+from .service import Service
 
 class Cluster:
     """
