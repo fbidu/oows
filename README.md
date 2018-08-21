@@ -38,6 +38,17 @@ First, install it with PIP
 
 `pip install boto3 oows`
 
-```python
+As of now, you'll need to supply a regular [boto3 Session](https://boto3.readthedocs.io/en/latest/reference/core/session.html)
 
-s = boto3.Session()  # Create a new boto3 Session 
+```python
+import boto3
+from oows import ecs
+
+
+s = boto3.Session()  # Create a new boto3 Session.
+
+cluster = ecs.Cluster("MyCluster", s)  # Initialize a new cluster object
+service = ecs.Service("server", cluster, s)  # Initialize a new service object
+task_definition = service.task_definition  # Gets the service's task definition
+task_definition.update_env("new_env", "new_value")  # Creates a new task definition with updated env
+```
