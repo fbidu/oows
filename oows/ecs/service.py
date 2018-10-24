@@ -79,6 +79,33 @@ class Service:
 
         return self.__description
 
+    @property
+    def deployments(self):
+        """
+        Returns the current service's deployments
+        """
+        return self.description['deployments']
+
+    def __getattr__(self, attribute):
+        """
+        Wrapper that exposes every field inside the dictionary
+        of description as attributes
+        """
+
+        # If the attribute does not exist as a key inside
+        # the description dictionary, we raise an exception
+        if attribute not in self.description:
+            raise AttributeError("{} does not exist!".format(attribute))
+
+        # If it does exist, we return it
+        return self.description[attribute]
+
+    def __repr__(self):
+        """
+        Basic string representation for a service is its name
+        """
+        return self.name
+
     def update_service(self, new_task_definition, force_new_deployment=True):
         """
         Calls the update_service method to use a new task definition.
