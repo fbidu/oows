@@ -4,6 +4,7 @@ Provides a class for AWS's ECS Task Definitions
 
 import boto3
 
+
 class TaskDefinition:
     """
     Abstracts an ECS's Task Definition
@@ -12,11 +13,12 @@ class TaskDefinition:
     __description = []
 
     def __init__(self, name, boto3_session):
-        assert isinstance(boto3_session, boto3.session.Session), \
-        "Please, provide an boto3 Session as argument!"
+        assert isinstance(
+            boto3_session, boto3.session.Session
+        ), "Please, provide an boto3 Session as argument!"
 
         self.name = name
-        self.ecs = boto3_session.client('ecs')
+        self.ecs = boto3_session.client("ecs")
 
     def update_description(self):
         """
@@ -34,17 +36,17 @@ class TaskDefinition:
             assert isinstance(data, dict)
 
             # Does the metadata points to a successful request?
-            assert int(data['ResponseMetadata']['HTTPStatusCode']) < 400
+            assert int(data["ResponseMetadata"]["HTTPStatusCode"]) < 400
 
             # Is there actual data in it and do we have exactly one service?
-            assert isinstance(data['taskDefinition'], dict)
+            assert isinstance(data["taskDefinition"], dict)
 
         except AssertionError as e:
             print("Found an assertion error {}".format(e))
             raise
 
         else:
-            self.__description = data['taskDefinition']
+            self.__description = data["taskDefinition"]
 
     @property
     def description(self):
@@ -91,20 +93,22 @@ class TaskDefinition:
         to AWS.
         """
 
-        containers = self.description['containerDefinitions']
+        containers = self.description["containerDefinitions"]
         updated_containers = []
 
         for container in containers:
             # Dict comprehension to convert list-of-dicts to dict. See method docstring
-            environment = {x['name']: x['value'] for x in container['environment']}
+            environment = {x["name"]: x["value"] for x in container["environment"]}
 
             if env_name in environment or insert_if_missing:
                 environment[env_name] = env_value
 
             # List comprehension to convert dict to list-of-dicts. See method docstring
-            environment = [{'name': key, 'value': value} for key, value in environment.items()]
+            environment = [
+                {"name": key, "value": value} for key, value in environment.items()
+            ]
 
-            container['environment'] = environment
+            container["environment"] = environment
 
             updated_containers.append(container)
 
@@ -114,16 +118,19 @@ class TaskDefinition:
 
         # Now we remove all the keys that doesn't make
         # sense for registering a new task definition
-        current_settings.pop('containerDefinitions')  # This is the parameter we changed
-        current_settings.pop('taskDefinitionArn')  # Points to the current definition
-        current_settings.pop('revision')  # Points to the current revision
-        current_settings.pop('status')  # The current status of the present task definition
-        current_settings.pop('requiresAttributes')  #  Not supported for new task definitions
-        current_settings.pop('compatibilities')  #  Not supported as well
+        current_settings.pop("containerDefinitions")  # This is the parameter we changed
+        current_settings.pop("taskDefinitionArn")  # Points to the current definition
+        current_settings.pop("revision")  # Points to the current revision
+        current_settings.pop(
+            "status"
+        )  # The current status of the present task definition
+        current_settings.pop(
+            "requiresAttributes"
+        )  #  Not supported for new task definitions
+        current_settings.pop("compatibilities")  #  Not supported as well
 
         # Register a new task definition using all the current
         # settings except for the containers
         return self.ecs.register_task_definition(
-            containerDefinitions=updated_containers,
-            **current_settings
+            containerDefinitions=updated_containers, **current_settings
         )
