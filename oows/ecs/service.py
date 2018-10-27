@@ -2,6 +2,7 @@ import boto3
 
 from .task_definition import TaskDefinition
 
+
 class Service:
     """
     Class to handle ECS Services
@@ -12,13 +13,17 @@ class Service:
     __tasks = []
 
     def __init__(self, name, cluster, boto3_session):
-        assert isinstance(boto3_session, boto3.session.Session), \
-        "Please, provide an boto3 Session as argument!"
+        assert isinstance(
+            boto3_session, boto3.session.Session
+        ), "Please, provide an boto3 Session as argument!"
+
+        """TODO: Check if `cluster` is either a Cluster instance or a string
+        and handle it correctly"""
 
         self.boto3_session = boto3_session
         self.name = name
         self.cluster = cluster
-        self.ecs = boto3_session.client('ecs')
+        self.ecs = boto3_session.client("ecs")
 
     def update_description(self):
         """
@@ -27,7 +32,9 @@ class Service:
         """
 
         try:
-            data = self.ecs.describe_services(cluster=self.cluster.name, services=[self.name])
+            data = self.ecs.describe_services(
+                cluster=self.cluster.name, services=[self.name]
+            )
 
             # Do we have data?
             assert data
@@ -36,20 +43,20 @@ class Service:
             assert isinstance(data, dict)
 
             # Do we have failures?
-            assert not list(data['failures'])
+            assert not list(data["failures"])
 
             # Does the metadata points to a successful request?
-            assert int(data['ResponseMetadata']['HTTPStatusCode']) < 400
+            assert int(data["ResponseMetadata"]["HTTPStatusCode"]) < 400
 
             # Is there actual data in it and do we have exactly one service?
-            assert len(data['services']) == 1
+            assert len(data["services"]) == 1
 
         except AssertionError as assertion_error:
             print("Found an assertion error {}".format(assertion_error))
             print("The current state of failures is: ")
-            print("\n".join(data['failures']))
+            print("\n".join(data["failures"]))
         else:
-            self.__description = data['services'][0]
+            self.__description = data["services"][0]
 
     @property
     def task_definition(self):
@@ -62,8 +69,7 @@ class Service:
                 self.update_description()
 
             self.__task_definition = TaskDefinition(
-                self.__description['taskDefinition'],
-                self.boto3_session
+                self.__description["taskDefinition"], self.boto3_session
             )
 
         return self.__task_definition
@@ -84,7 +90,7 @@ class Service:
         """
         Returns the current service's deployments
         """
-        return self.description['deployments']
+        return self.description["deployments"]
 
     def __getattr__(self, attribute):
         """
@@ -112,7 +118,8 @@ class Service:
         It forces a new deployment by default
         """
         return self.ecs.update_service(
-            cluster=self.cluster.name, service=self.name,
+            cluster=self.cluster.name,
+            service=self.name,
             taskDefinition=new_task_definition,
-            forceNewDeployment=force_new_deployment
+            forceNewDeployment=force_new_deployment,
         )
